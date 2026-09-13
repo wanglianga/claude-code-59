@@ -1,0 +1,44 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*secret*
+*token*
+*credential*
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+target/
+coverage/
+.cache/
+*.log
+*.tmp
+*.temp
+*.db
+*.sqlite*
+
+# Local agent/session/QA artifacts
+.claude/
+.codex/
+.playwright-cli/
+CLAUDE.md
+verify.py
+*memory*
+*skill*
+*skills*
+*_traces/
+*.jsonl
+*.tsv
+*qa-report*
+*qa_report*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-pethospital}
+      POSTGRES_USER: ${DB_USER:-pet}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-petpass}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # 数据库端口不发布到宿主，仅在 compose 内部网络提供服务
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pet} -d ${DB_NAME:-pethospital}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-pethospital}
+      DB_USER: ${DB_USER:-pet}
+      DB_PASSWORD: ${DB_PASSWORD:-petpass}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+    ports:
+      - "${CC_PUBLISH_PORT}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  pgdata:
